@@ -9,7 +9,7 @@
     
     <title>
         
-            Hello World |
+            把Hexo部署到Github Page |
         
         Wang Yu
     </title>
@@ -117,7 +117,7 @@
     <div class="article-content-container">
 
         <div class="article-title">
-            <span class="title-hover-animation">Hello World</span>
+            <span class="title-hover-animation">把Hexo部署到Github Page</span>
         </div>
 
         
@@ -133,7 +133,7 @@
                     <div class="meta-info">
                         <div class="article-meta-info">
     <span class="article-date article-meta-item">
-        <i class="fas fa-edit"></i> 2021-01-21 16:14:38
+        <i class="fas fa-edit"></i> 2021-01-21 17:18:44
     </span>
     
     
@@ -150,15 +150,30 @@
         
 
         <div class="article-content markdown-body">
-            <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+            <h1 id="使用Hexo搭建博客系统部署到Github"><a href="#使用Hexo搭建博客系统部署到Github" class="headerlink" title="使用Hexo搭建博客系统部署到Github"></a>使用Hexo搭建博客系统部署到Github</h1><h3 id="1-Hexo"><a href="#1-Hexo" class="headerlink" title="1.Hexo"></a>1.Hexo</h3><p>官网地址：<a class="link"   target="_blank" rel="noopener" href="https://hexo.io/zh-cn/" >https://hexo.io/zh-cn/<i class="fas fa-external-link-alt"></i></a></p>
+<p>快速、简洁且高效的博客框架</p>
+<h3 id="2-安装Git，Node-js"><a href="#2-安装Git，Node-js" class="headerlink" title="2.安装Git，Node.js"></a>2.安装Git，Node.js</h3><h3 id="3-安装Hexo"><a href="#3-安装Hexo" class="headerlink" title="3.安装Hexo"></a>3.安装Hexo</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">npm install -g hexo-cli</span><br><span class="line">hexo init &lt;folder&gt;</span><br><span class="line">cd &lt;folder&gt;</span><br><span class="line">npm install</span><br></pre></td></tr></table></figure>
+<h3 id="4-修改配置-config-yml"><a href="#4-修改配置-config-yml" class="headerlink" title="4.修改配置 _config.yml"></a>4.修改配置 <code>_config.yml</code></h3><p>官网有详细说明，这里我就不列举了</p>
+<h3 id="5-本地启动服务"><a href="#5-本地启动服务" class="headerlink" title="5.本地启动服务"></a>5.本地启动服务</h3><p><code>hexo g</code>  生成静态文件</p>
+<p><code>hexo s </code> 启动服务，默认端口： 4000</p>
+<h3 id="6-选取主题"><a href="#6-选取主题" class="headerlink" title="6.选取主题"></a>6.选取主题</h3><p>官网主题地址：<a class="link"   target="_blank" rel="noopener" href="https://hexo.io/themes/" >https://hexo.io/themes/<i class="fas fa-external-link-alt"></i></a></p>
+<p>进到主题内有详细的git仓库地址，有安装说明，基本就是把git仓库下载到本地 <code>themes/</code> 目录下。</p>
+<p>修改_config.yml里的theme为新建主题目录的名字</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hexo clean</span><br><span class="line">hexo g</span><br><span class="line">hexo s</span><br></pre></td></tr></table></figure>
+<p>之后刷新页面看下效果</p>
+<h3 id="7-添加文章"><a href="#7-添加文章" class="headerlink" title="7.添加文章"></a>7.添加文章</h3><p>hexo new “your-post-name”</p>
+<p>如果想在本地存放图片等信息需要在_config.yml修改</p>
+<p>post_asset_folder: true</p>
+<p>开启这个配置当新建文件时会在本地创建两个文件，一个是存Markdown文档的，一个储存图片和音频的</p>
+<h3 id="8-部署到Github"><a href="#8-部署到Github" class="headerlink" title="8.部署到Github"></a>8.部署到Github</h3><p>首先到Github创建一个公开的项目，名字为你的<code>账号名.github.io</code> </p>
+<p>此处一定要设置为账号名为前缀的域名，不然后续会有一些坑，导致你的页面显示不了JS</p>
+<h3 id="9-在设置中配置-Github-Pages-选择分支"><a href="#9-在设置中配置-Github-Pages-选择分支" class="headerlink" title="9.在设置中配置 Github Pages 选择分支"></a>9.在设置中配置 Github Pages 选择分支</h3><h3 id="10-在本地配置链接Github"><a href="#10-在本地配置链接Github" class="headerlink" title="10.在本地配置链接Github"></a>10.在本地配置链接Github</h3><p>安装  <code>npm install hexo-deployer-git --save</code></p>
+<p>配置_config.yml</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">deploy:</span><br><span class="line">  <span class="built_in">type</span>: git</span><br><span class="line">  repo: 你的git地址</span><br><span class="line">  branch: 分支</span><br></pre></td></tr></table></figure>
+<p>hexo g</p>
+<p>hexo d</p>
+<p>出现INFO Deploy done: git则大功告成，可以去GitHub上访问看看在线网站</p>
+<p>参考文章地址：<a class="link"   target="_blank" rel="noopener" href="https://www.jianshu.com/p/282717c8da6c" >https://www.jianshu.com/p/282717c8da6c<i class="fas fa-external-link-alt"></i></a></p>
 
         </div>
 
@@ -167,21 +182,21 @@
         
             <div class="article-nav">
                 
-                    <div class="article-prev">
-                        <a class="prev"
-                           rel="prev"
-                           href="/2021/01/21/%E6%8A%8AHexo%E9%83%A8%E7%BD%B2%E5%88%B0Github-Page/"
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2021/01/21/hello-world/"
                         >
-                            <span class="left arrow-icon flex-center">
-                              <i class="fas fa-chevron-left"></i>
-                            </span>
                             <span class="title flex-center">
-                                <span class="post-nav-title-item">把Hexo部署到Github Page</span>
-                                <span class="post-nav-item">上一篇</span>
+                                <span class="post-nav-title-item">Hello World</span>
+                                <span class="post-nav-item">下一篇</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
                             </span>
                         </a>
                     </div>
-                
                 
             </div>
         
