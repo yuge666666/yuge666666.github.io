@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="Hexo Theme Keep">
+    <meta name="author" content="wy">
+    
+    <title>
+        
+            Window10安装Flink1.10.0 |
+        
+        Wang Yu
+    </title>
+    <link rel="shortcut icon" href="/images/logo.svg">
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"example.com","root":"/","language":"zh-CN"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.svg","favicon":"/images/logo.svg","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":false,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."},"scroll":{"progress_bar":{"enable":false},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.3.0"};
+    KEEP.language_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 月前","year":"%s 年前"};
+  </script>
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            <a class="logo-title" href="/">
+                Wang Yu
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                首页
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                归档
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">首页</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">归档</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content normal-code-theme">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">Window10安装Flink1.10.0</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span>wy</span>
+                        <span class="level">Lv1</span>
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i> 2021-01-23 13:43:01
+    </span>
+    
+    
+
+    
+    
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <p>基本可以确定在window10安装Flink1.10.0启动时会出问题，特别恶心，目前无法修复，现在讲一讲我的踩坑经历。</p>
+<p>首先我们去官网下载压缩包，官网下载地址：<a class="link"   target="_blank" rel="noopener" href="https://flink.apache.org/downloads.html" >https://flink.apache.org/downloads.html<i class="fas fa-external-link-alt"></i></a></p>
+<p>一步到位地址：<a class="link"   target="_blank" rel="noopener" href="http://archive.apache.org/dist/flink/flink-1.10.0/" >http://archive.apache.org/dist/flink/flink-1.10.0/<i class="fas fa-external-link-alt"></i></a></p>
+<p><img src="https://wy-test-1300689106.cos.ap-chengdu.myqcloud.com/format,png-20210123134320533.png"></p>
+<p><img src="https://wy-test-1300689106.cos.ap-chengdu.myqcloud.com/format,png-20210123134320533.png"></p>
+<p>下载后到本地解压到自己喜欢的一个路径下，尽量不要带中文路径，保持良好的开发规范。</p>
+<p>找到对应安装路径下 <code>apache-flink-1.10.0\bin</code>找到 <code>start-cluster.bat</code>双击或者在cmd命令行执行。</p>
+<p>正常是会非常顺利的起来，但是如果执行后会默认打开两个cmd窗口，一个是Jobmanager,一个是taskmanager，过了没一会，taskmanager的窗口突然就消失了，访问集群页面 <code>http://localhost:8081/#/overview</code></p>
+<p><img src="https://wy-test-1300689106.cos.ap-chengdu.myqcloud.com/format,png-20210123134320533.png"></p>
+<p>发现taskmanager没有起来，此时此刻只能去 <code>apache-flink-1.10.0\deps\log</code>路径下去找taskmanager日志文件，查看到底是什么情况，我们会发现有一个 <code>flink-用户名-taskmanager.log</code>文件我们打开文件会提示类似错误</p>
+<figure class="highlight verilog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">2020</span>-<span class="number">04</span>-<span class="number">02</span> <span class="number">10</span>:<span class="number">06</span>:<span class="number">28</span>,<span class="number">864</span> ERROR org<span class="variable">.apache</span><span class="variable">.flink</span><span class="variable">.runtime</span><span class="variable">.taskexecutor</span><span class="variable">.TaskManagerRunner</span>       - TaskManager initialization failed.</span><br><span class="line">org<span class="variable">.apache</span><span class="variable">.flink</span><span class="variable">.configuration</span><span class="variable">.IllegalConfigurationException</span>: Failed to create TaskExecutorResourceSpec</span><br><span class="line">	at org<span class="variable">.apache</span><span class="variable">.flink</span><span class="variable">.runtime</span><span class="variable">.taskexecutor</span><span class="variable">.TaskExecutorResourceUtils</span><span class="variable">.resourceSpecFromConfig</span>(TaskExecutorResourceUtils<span class="variable">.java</span>:<span class="number">72</span>)</span><br><span class="line">	at org<span class="variable">.apache</span><span class="variable">.flink</span><span class="variable">.runtime</span><span class="variable">.taskexecutor</span><span class="variable">.TaskManagerRunner</span><span class="variable">.startTaskManager</span>(TaskManagerRunner<span class="variable">.java</span>:<span class="number">356</span>)</span><br><span class="line">	at org<span class="variable">.apache</span><span class="variable">.flink</span><span class="variable">.runtime</span><span class="variable">.taskexecutor</span><span class="variable">.TaskManagerRunner</span>.&lt;init&gt;(TaskManagerRunner<span class="variable">.java</span>:<span class="number">152</span>)</span><br><span class="line">	at org<span class="variable">.apache</span><span class="variable">.flink</span><span class="variable">.runtime</span><span class="variable">.taskexecutor</span><span class="variable">.TaskManagerRunner</span><span class="variable">.runTaskManager</span>(TaskManagerRunner<span class="variable">.java</span>:<span class="number">308</span>)</span><br><span class="line">	at org<span class="variable">.apache</span><span class="variable">.flink</span><span class="variable">.runtime</span><span class="variable">.taskexecutor</span><span class="variable">.TaskManagerRunner</span><span class="variable">.lambda</span>$runTaskManagerSecurely$<span class="number">2</span>(TaskManagerRunner<span class="variable">.java</span>:<span class="number">322</span>)</span><br><span class="line">	at java<span class="variable">.security</span><span class="variable">.AccessController</span><span class="variable">.doPrivileged</span>(Native Method)</span><br><span class="line">	at javax<span class="variable">.security</span><span class="variable">.auth</span><span class="variable">.Subject</span><span class="variable">.doAs</span>(Subject<span class="variable">.java</span>:<span class="number">422</span>)</span><br><span class="line">	at org<span class="variable">.apache</span><span class="variable">.hadoop</span><span class="variable">.security</span><span class="variable">.UserGroupInformation</span><span class="variable">.doAs</span>(UserGroupInformation<span class="variable">.java</span>:<span class="number">1754</span>)</span><br><span class="line">	at org<span class="variable">.apache</span><span class="variable">.flink</span><span class="variable">.runtime</span><span class="variable">.security</span><span class="variable">.HadoopSecurityContext</span><span class="variable">.runSecured</span>(HadoopSecurityContext<span class="variable">.java</span>:<span class="number">41</span>)</span><br><span class="line">	at org<span class="variable">.apache</span><span class="variable">.flink</span><span class="variable">.runtime</span><span class="variable">.taskexecutor</span><span class="variable">.TaskManagerRunner</span><span class="variable">.runTaskManagerSecurely</span>(TaskManagerRunner<span class="variable">.java</span>:<span class="number">321</span>)</span><br><span class="line">	at org<span class="variable">.apache</span><span class="variable">.flink</span><span class="variable">.runtime</span><span class="variable">.taskexecutor</span><span class="variable">.TaskManagerRunner</span><span class="variable">.main</span>(TaskManagerRunner<span class="variable">.java</span>:<span class="number">287</span>)</span><br><span class="line">Caused by: org<span class="variable">.apache</span><span class="variable">.flink</span><span class="variable">.configuration</span><span class="variable">.IllegalConfigurationException</span>: The required configuration option Key: &#x27;taskmanager<span class="variable">.cpu</span><span class="variable">.cores</span>&#x27; , <span class="keyword">default</span>: <span class="literal">null</span> (fallback keys: []) is <span class="keyword">not</span> set</span><br><span class="line">	at org<span class="variable">.apache</span><span class="variable">.flink</span><span class="variable">.runtime</span><span class="variable">.taskexecutor</span><span class="variable">.TaskExecutorResourceUtils</span><span class="variable">.checkConfigOptionIsSet</span>(TaskExecutorResourceUtils<span class="variable">.java</span>:<span class="number">90</span>)</span><br><span class="line">	at org<span class="variable">.apache</span><span class="variable">.flink</span><span class="variable">.runtime</span><span class="variable">.taskexecutor</span><span class="variable">.TaskExecutorResourceUtils</span><span class="variable">.lambda</span>$checkTaskExecutorResourceConfigSet$<span class="number">0</span>(TaskExecutorResourceUtils<span class="variable">.java</span>:<span class="number">84</span>)</span><br><span class="line">	at java<span class="variable">.util</span><span class="variable">.Arrays</span>$ArrayList<span class="variable">.forEach</span>(Arrays<span class="variable">.java</span>:<span class="number">3880</span>)</span><br><span class="line">	at org<span class="variable">.apache</span><span class="variable">.flink</span><span class="variable">.runtime</span><span class="variable">.taskexecutor</span><span class="variable">.TaskExecutorResourceUtils</span><span class="variable">.checkTaskExecutorResourceConfigSet</span>(TaskExecutorResourceUtils<span class="variable">.java</span>:<span class="number">84</span>)</span><br><span class="line">	at org<span class="variable">.apache</span><span class="variable">.flink</span><span class="variable">.runtime</span><span class="variable">.taskexecutor</span><span class="variable">.TaskExecutorResourceUtils</span><span class="variable">.resourceSpecFromConfig</span>(TaskExecutorResourceUtils<span class="variable">.java</span>:<span class="number">70</span>)</span><br><span class="line">	... <span class="number">10</span> more</span><br><span class="line"><span class="number">2020</span>-<span class="number">04</span>-<span class="number">02</span> <span class="number">10</span>:<span class="number">06</span>:<span class="number">28</span>,<span class="number">890</span> INFO  org<span class="variable">.apache</span><span class="variable">.flink</span><span class="variable">.runtime</span><span class="variable">.blob</span><span class="variable">.TransientBlobCache</span>              - Shutting down BLOB cache</span><br><span class="line"><span class="number">2020</span>-<span class="number">04</span>-<span class="number">02</span> <span class="number">10</span>:<span class="number">06</span>:<span class="number">28</span>,<span class="number">902</span> INFO  org<span class="variable">.apache</span><span class="variable">.flink</span><span class="variable">.runtime</span><span class="variable">.blob</span><span class="variable">.PermanentBlobCache</span>              - Shutting down BLOB cache</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>大致意思是说 <code>taskmanager.cpu.cores</code> 没有设置这个必需具体的参数，默认是NULL，需要我们手动设置一下具体的值，根据机器配置可自行设置参数，接下来重新集群还会提示很多类似的配置参数没设置的错误，而且每次只会提示一条，笔者在这里把所有的坑都踩了一下，最后的问题基本是window系统与Flink1.10.0不太兼容，建议换成Linux或者MAC环境。</p>
+
+        </div>
+
+        
+
+        
+            <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2021/01/23/FLink%E8%AF%BB%E5%8F%96-%E6%8F%92%E5%85%A5Hive%E6%95%B0%E6%8D%AE%E5%85%A5%E5%9D%91%E6%8C%87%E5%8D%97/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">FLink读取+插入Hive数据入坑指南</span>
+                                <span class="post-nav-item">上一篇</span>
+                            </span>
+                        </a>
+                    </div>
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2021/01/23/Linux%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%AE%89%E8%A3%85FLink1-10-0%E5%B9%B6%E5%90%AF%E5%8A%A8SQL-client%E8%AF%BB%E5%8F%96Hive%E6%95%B0%E6%8D%AE/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Linux环境下安装FLink1.10.0并启动SQL-client读取Hive数据</span>
+                                <span class="post-nav-item">下一篇</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span> -
+            
+            2021 <i class="fas fa-heart icon-animate"></i> <a href="/">wy</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            由 <a target="_blank" href="https://hexo.io">Hexo</a> 驱动 | 主题 <a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.3.0</a>
+        </div>
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>

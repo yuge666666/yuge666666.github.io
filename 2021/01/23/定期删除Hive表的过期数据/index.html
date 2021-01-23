@@ -9,7 +9,7 @@
     
     <title>
         
-            Flink特性 |
+            定期删除Hive表的过期数据 |
         
         Wang Yu
     </title>
@@ -117,7 +117,7 @@
     <div class="article-content-container">
 
         <div class="article-title">
-            <span class="title-hover-animation">Flink特性</span>
+            <span class="title-hover-animation">定期删除Hive表的过期数据</span>
         </div>
 
         
@@ -133,7 +133,7 @@
                     <div class="meta-info">
                         <div class="article-meta-info">
     <span class="article-date article-meta-item">
-        <i class="fas fa-edit"></i> 2021-01-21 18:25:52
+        <i class="fas fa-edit"></i> 2021-01-23 13:38:45
     </span>
     
     
@@ -150,14 +150,9 @@
         
 
         <div class="article-content markdown-body">
-            <h1 id="Flink特性"><a href="#Flink特性" class="headerlink" title="Flink特性"></a>Flink特性</h1><p>一、统一的数据处理组件栈，不仅能处理流处理，还可以用于批处理，机器学习，可以满足不同的用户的需求，对不同形式的计算进行了整合。</p>
-<p>二、支持时间时间，接入时间，处理时间等时间概念。</p>
-<p>三、基于轻量级分布式快照实现容错（checkpoint）。</p>
-<p>四、有状态计算。可以将状态存储在HDFS，内存，RockDB。</p>
-<p>五、支持高度灵活的窗口，比如：session window，滚动窗口，滑动窗口等。</p>
-<p>六、反压，当下流算子处理不过来的时候，对上层算子的消费速度进行控制。</p>
-<p>七、基于JVM实现自己的内存管理。</p>
-
+            <p>由于Hive中有很多表都是每日全量的，数据量比较大，有些是可以将过去历史分区的数据进行删除的，所以需要一个定时执行的脚本，定时删除前七天的过期数据。</p>
+<p>注：此脚本只针对分区字段为日期类型</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">/bin/bash</span></span><br><span class="line"></span><br><span class="line">today=$(date +%Y-%m-%d)</span><br><span class="line">today_timestamp=$(date -d &quot;$today&quot; +%s)</span><br><span class="line">echo &quot;获取今天日期：$today,今日日期的时间戳：$today_timestamp&quot;</span><br><span class="line">detele_day=$(date -d &quot;7 days ago&quot; +%Y-%m-%d)</span><br><span class="line">detele_day_timestamp=$(date -d &quot;$detele_day&quot; +%s)</span><br><span class="line">echo &quot;获取60天前日期：$detele_day,60天前日期的时间戳：$detele_day_timestamp&quot;</span><br><span class="line">hdfs_directorys=(</span><br><span class="line">  /apps/hive/warehouse/某个库/某个表/</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">for hdfs_directory in $&#123;hdfs_directorys[@]&#125;; do</span><br><span class="line">  echo &quot;当前要删除的hdfs路径为：$&#123;hdfs_directory&#125;&quot;</span><br><span class="line">  for hdfs_directory_p_day in $(sudo -u hdfs hdfs dfs -ls $&#123;hdfs_directory&#125; | awk &#x27;BEGIN&#123;FS=&quot; &quot;&#125;&#123;print $8&#125;&#x27;); do</span><br><span class="line">    p_day=$(echo $hdfs_directory_p_day | awk &#x27;BEGIN&#123;FS=&quot;=&quot;&#125;&#123;print $2&#125;&#x27;)</span><br><span class="line">    p_day_timestamp=$(date -d &quot;$p_day&quot; +%s)</span><br><span class="line">    echo &quot;当前文件夹分区日期为：$p_day, 当前文件夹分区日期时间戳为：$p_day_timestamp&quot;</span><br><span class="line">    if [ $p_day_timestamp -lt $detele_day_timestamp ]; then</span><br><span class="line">      echo &quot;该HDFS的目录即将被删除，路径为：$hdfs_directory_p_day&quot;</span><br><span class="line">      sudo -u hdfs hadoop dfs -rm -r -skipTrash $hdfs_directory_p_day</span><br><span class="line">    else</span><br><span class="line">      echo &quot;该HDFS的目录处于正常周期内不会被删除，路径为：$hdfs_directory_p_day&quot;</span><br><span class="line">    fi</span><br><span class="line">  done</span><br><span class="line">done</span><br><span class="line">echo &quot;程序运行完成&quot;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
         </div>
 
         
@@ -168,13 +163,13 @@
                     <div class="article-prev">
                         <a class="prev"
                            rel="prev"
-                           href="/2021/01/23/%E5%AE%9A%E6%9C%9F%E5%88%A0%E9%99%A4Hive%E8%A1%A8%E7%9A%84%E8%BF%87%E6%9C%9F%E6%95%B0%E6%8D%AE/"
+                           href="/2021/01/23/SparkStreaming%E5%BB%B6%E8%BF%9F%E7%9B%91%E6%8E%A7/"
                         >
                             <span class="left arrow-icon flex-center">
                               <i class="fas fa-chevron-left"></i>
                             </span>
                             <span class="title flex-center">
-                                <span class="post-nav-title-item">定期删除Hive表的过期数据</span>
+                                <span class="post-nav-title-item">SparkStreaming延迟监控</span>
                                 <span class="post-nav-item">上一篇</span>
                             </span>
                         </a>
@@ -184,10 +179,10 @@
                     <div class="article-next">
                         <a class="next"
                            rel="next"
-                           href="/2021/01/21/%E6%8A%8AHexo%E9%83%A8%E7%BD%B2%E5%88%B0Github-Page/"
+                           href="/2021/01/21/Flink%E7%89%B9%E6%80%A7/"
                         >
                             <span class="title flex-center">
-                                <span class="post-nav-title-item">把Hexo部署到Github Page</span>
+                                <span class="post-nav-title-item">Flink特性</span>
                                 <span class="post-nav-item">下一篇</span>
                             </span>
                             <span class="right arrow-icon flex-center">

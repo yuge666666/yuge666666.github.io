@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="Hexo Theme Keep">
+    <meta name="author" content="wy">
+    
+    <title>
+        
+            SparkStreaming延迟监控 |
+        
+        Wang Yu
+    </title>
+    <link rel="shortcut icon" href="/images/logo.svg">
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"example.com","root":"/","language":"zh-CN"};
+    KEEP.theme_config = {"toc":{"enable":false,"number":false,"expand_all":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.svg","favicon":"/images/logo.svg","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":false,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."},"scroll":{"progress_bar":{"enable":false},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":false,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.3.0"};
+    KEEP.language_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 月前","year":"%s 年前"};
+  </script>
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            <a class="logo-title" href="/">
+                Wang Yu
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                首页
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                归档
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">首页</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">归档</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content normal-code-theme">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">SparkStreaming延迟监控</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.svg">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span>wy</span>
+                        <span class="level">Lv1</span>
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i> 2021-01-23 13:39:57
+    </span>
+    
+    
+
+    
+    
+    
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <pre><code>    这篇博客来源于一个惨痛的线上事故经历，我们编写好SparkStreaming程序清洗行为数据，然后每十分钟往Hive写一次，大家都以为任务正常的运行，不会出什么问题，然而问题正在后台默默的产生了，到了第二天，所有依赖于Hive这张行为数据表的报表数据都少了很多，这是为啥呢？为什么会有这个问题？答案：数据过多，Spark Streaming调度批次积压，再加上数据倾斜，导致一个批次任务运行时间超过了原来正常运行时间的二倍，数据延迟三个小时。
+
+    这种事故最快的解决办法就是把报表任务再跑一遍，数据就全了，但是治标不治本，必须根据数据延迟情况适当调整资源和Kafka的Topic分区数，怎么才能知道Spark Streaming任务什么时候延迟呢？以及延迟情况是怎么样的呢？大家可能都知道去Spark Streaming的Web UI去看呀，地址：http://resourcemanager地址/proxy/application_id/streaming/，问题来了，我们能天天盯着它看吗，而且有可能时间不固定，后来用了爬虫的思想，先请求一下监控界面，看看能拿到哪些信息，然后在清洗一下，把关键的指标拿出来，超过阈值则报警，这样我们可以快速知道积压情况，并且及时处理，以防事故再次发生。</code></pre>
+<p>参数说明:–application_name : Spark Streaming代码里的application_name，–active_batches：最高可接收延迟的批次数，大于此值则报警。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># coding:utf-8</span></span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">from</span> lxml <span class="keyword">import</span> etree</span><br><span class="line"><span class="keyword">from</span> optparse <span class="keyword">import</span> OptionParser</span><br><span class="line">reload(sys)</span><br><span class="line">sys.setdefaultencoding(<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line">BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))</span><br><span class="line">sys.path.append(BASE_DIR)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">option_parser</span>():</span></span><br><span class="line">    usage = <span class="string">&quot;usage: %prog [options] arg1&quot;</span></span><br><span class="line"></span><br><span class="line">    parser = OptionParser(usage=usage)</span><br><span class="line"></span><br><span class="line">    parser.add_option(<span class="string">&quot;--application_name&quot;</span>, dest=<span class="string">&quot;application_name&quot;</span>, action=<span class="string">&quot;store&quot;</span>, <span class="built_in">type</span>=<span class="string">&quot;string&quot;</span>, <span class="built_in">help</span>=<span class="string">&quot;&quot;</span>)</span><br><span class="line">    parser.add_option(<span class="string">&quot;--active_batches&quot;</span>, dest=<span class="string">&quot;active_batches&quot;</span>, action=<span class="string">&quot;store&quot;</span>, <span class="built_in">type</span>=<span class="string">&quot;string&quot;</span>, <span class="built_in">help</span>=<span class="string">&quot;&quot;</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> parser</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line"></span><br><span class="line">    reload(sys)</span><br><span class="line">    sys.setdefaultencoding(<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line"></span><br><span class="line">    optParser = option_parser()</span><br><span class="line">    options, args = optParser.parse_args(sys.argv[<span class="number">1</span>:])</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (options.application_name <span class="keyword">is</span> <span class="literal">None</span> <span class="keyword">or</span> options.active_batches <span class="keyword">is</span> <span class="literal">None</span>):</span><br><span class="line">        <span class="built_in">print</span> <span class="string">&quot;请指定完整参数--application_name --active_batches&quot;</span></span><br><span class="line">        exit(<span class="number">1</span>)</span><br><span class="line">    active_batche = <span class="number">0</span></span><br><span class="line">    record = <span class="string">&quot;&quot;</span></span><br><span class="line">    schedul = <span class="string">&quot;&quot;</span></span><br><span class="line">    resourcemanager_url = <span class="string">&quot;resourcemanager_url&quot;</span> <span class="comment"># 例：http://localhost:8088/cluster/scheduler</span></span><br><span class="line">    resourcemanager_url_html = requests.get(resourcemanager_url).content.decode(<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line">    html = etree.HTML(resourcemanager_url_html)</span><br><span class="line">    application_content = html.xpath(<span class="string">&#x27;//*[@id=&quot;apps&quot;]/script&#x27;</span>)</span><br><span class="line">    <span class="keyword">for</span> content <span class="keyword">in</span> application_content:</span><br><span class="line">        application_text_list = content.text.split(<span class="string">&quot;=&quot;</span>, <span class="number">1</span>)[<span class="number">1</span>].split(<span class="string">&quot;],&quot;</span>)</span><br><span class="line">        <span class="keyword">for</span> application_text <span class="keyword">in</span> application_text_list:</span><br><span class="line">            application_text = application_text.replace(<span class="string">&quot;[&quot;</span>, <span class="string">&quot;&quot;</span>).replace(<span class="string">&quot;]&quot;</span>, <span class="string">&quot;&quot;</span>).split(<span class="string">&quot;,&quot;</span>)</span><br><span class="line">            application_name = application_text[<span class="number">2</span>].replace(<span class="string">&quot;\&quot;&quot;</span>, <span class="string">&quot;&quot;</span>)</span><br><span class="line">            application_id = re.findall(<span class="string">&quot;&gt;(.*)&lt;&quot;</span>, <span class="built_in">str</span>(application_text[<span class="number">0</span>]))[<span class="number">0</span>]</span><br><span class="line">            <span class="keyword">if</span> (application_name == options.application_name):</span><br><span class="line">                streaming_url = <span class="string">&quot;http://localhost:8088/proxy/%s/streaming/&quot;</span> % application_id</span><br><span class="line">                streaming_html = requests.get(streaming_url).content.decode(<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line">                streaming_html = etree.HTML(streaming_html)</span><br><span class="line">                streaming_content_list = streaming_html.xpath(<span class="string">&#x27;//*[@id=&quot;active&quot;]&#x27;</span>)</span><br><span class="line">                <span class="comment"># 清洗active_batche</span></span><br><span class="line">                <span class="keyword">for</span> content <span class="keyword">in</span> streaming_content_list:</span><br><span class="line">                    active_batches = content.text</span><br><span class="line">                    active_batche = <span class="built_in">int</span>(re.findall(<span class="string">&quot;\((.*)\)&quot;</span>, active_batches)[<span class="number">0</span>])</span><br><span class="line">                streaming_records_list = streaming_html.xpath(<span class="string">&#x27;//*[@id=&quot;active-batches-table&quot;]/tbody/*/td[2]&#x27;</span>)</span><br><span class="line">                <span class="comment"># 清洗record</span></span><br><span class="line">                <span class="keyword">for</span> records <span class="keyword">in</span> streaming_records_list:</span><br><span class="line">                    record = records.text</span><br><span class="line">                streaming_scheduling_delay_list = streaming_html.xpath(<span class="string">&#x27;//*[@id=&quot;active-batches-table&quot;]/tbody/*/td[3]&#x27;</span>)</span><br><span class="line">                <span class="comment"># 清洗Scheduling Delay</span></span><br><span class="line">                <span class="keyword">for</span> scheduling <span class="keyword">in</span> streaming_scheduling_delay_list:</span><br><span class="line">                    schedul = scheduling.text</span><br><span class="line">                <span class="built_in">print</span> active_batche</span><br><span class="line">                <span class="keyword">if</span> (active_batche &gt; <span class="built_in">int</span>(options.active_batches)):</span><br><span class="line">                    content = <span class="string">&quot;任务%s延迟了,积压批次:%d,Records:%s,Scheduling Delay:%s&quot;</span> % (application_name, active_batche, record, schedul)</span><br><span class="line">                    <span class="built_in">print</span> content</span><br><span class="line">                    <span class="comment"># TODO 加上公司内部IM接口通知地址，时刻关注，推荐用飞书</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+        </div>
+
+        
+
+        
+            <div class="article-nav">
+                
+                    <div class="article-prev">
+                        <a class="prev"
+                           rel="prev"
+                           href="/2021/01/23/Linux%E7%8E%AF%E5%A2%83%E4%B8%8B%E5%AE%89%E8%A3%85FLink1-10-0%E5%B9%B6%E5%90%AF%E5%8A%A8SQL-client%E8%AF%BB%E5%8F%96Hive%E6%95%B0%E6%8D%AE/"
+                        >
+                            <span class="left arrow-icon flex-center">
+                              <i class="fas fa-chevron-left"></i>
+                            </span>
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Linux环境下安装FLink1.10.0并启动SQL-client读取Hive数据</span>
+                                <span class="post-nav-item">上一篇</span>
+                            </span>
+                        </a>
+                    </div>
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2021/01/23/%E5%AE%9A%E6%9C%9F%E5%88%A0%E9%99%A4Hive%E8%A1%A8%E7%9A%84%E8%BF%87%E6%9C%9F%E6%95%B0%E6%8D%AE/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">定期删除Hive表的过期数据</span>
+                                <span class="post-nav-item">下一篇</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span> -
+            
+            2021 <i class="fas fa-heart icon-animate"></i> <a href="/">wy</a>
+        </div>
+        
+        <div class="theme-info info-item">
+            由 <a target="_blank" href="https://hexo.io">Hexo</a> 驱动 | 主题 <a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.3.0</a>
+        </div>
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+
+
+
+<div class="post-scripts">
+    
+</div>
+
+
+
+</body>
+</html>
